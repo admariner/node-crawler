@@ -255,7 +255,22 @@ class Crawler extends EventEmitter {
         }
         // @todo other properties
     }
-
+    /**
+     * @param options
+     * @returns if there is a "callback" function in the options, return the result of the callback function. \
+     * Otherwise, return a promise, which resolves when the request is successful and rejects when the request fails.
+     * In the case of the promise, the resolved value will be the response object.
+     * @description Send a request directly.
+     * @example
+     * ```js
+     * const crawler = new Crawler();
+     * crawler.send({
+     *      url: "https://example.com",
+     *      callback: (error, response, done) => { done(); }
+     * });
+     * await crawler.send("https://example.com");
+     * ```
+     */
     public send = async (options: RequestConfig): Promise<CrawlerResponse> => {
         options = getValidOptions(options);
         options.retries = options.retries ?? 0;
@@ -264,11 +279,26 @@ class Crawler extends EventEmitter {
         delete options.preRequest;
         return await this._execute(options);
     };
-
+    /**
+     * @deprecated
+     * @description Old interface version. It is recommended to use `Crawler.send()` instead.
+     * @see Crawler.send
+     */
     public direct = async (options: RequestConfig): Promise<CrawlerResponse> => {
         return await this.send(options);
     };
-
+    /**
+     * @param options
+     * @description Add a request to the queue.
+     * @example
+     * ```js
+     * const crawler = new Crawler();
+     * crawler.add({
+     *     url: "https://example.com",
+     *     callback: (error, response, done) => { done(); }
+     * });
+     * ```
+     */
     public add = (options: RequestConfig): void => {
         let optionsArray = Array.isArray(options) ? options : [options];
         optionsArray = flattenDeep(optionsArray);
@@ -296,7 +326,11 @@ class Crawler extends EventEmitter {
                 .catch((error: unknown) => log.error(error));
         });
     };
-
+    /**
+     * @deprecated
+     * @description Old interface version. It is recommended to use `Crawler.add()` instead.
+     * @see Crawler.add
+     */
     public queue = (options: RequestConfig): void => {
         return this.add(options);
     };
