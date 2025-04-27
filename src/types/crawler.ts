@@ -99,7 +99,22 @@ export type RequestOptions = {
     body?: string | Record<string, unknown>;
     headers?: Record<string, unknown>;
     agent?: any;
-
+    /**
+     * @deprecated Please do not set 'logger' anymore.
+     */
+    logger?: any;
+    /**
+     * @deprecated Please do not set 'debug' anymore.
+     */
+    debug?: any;
+    /**
+     * @deprecated Please do not set 'time' anymore.
+     */
+    time?: any;
+    /**
+     * @deprecated Please use "rateLimit" instead.
+     */
+    limiter?: any;
     /**
      * @deprecated Please use "url" instead.
      */
@@ -144,6 +159,11 @@ export type RequestOptions = {
     isJson?: boolean;
 
     referer?: string;
+        /**
+     * @deprecated
+     * @description Please use "userParams" instead.
+     */
+    gene?: string | Record<string, unknown>;
     userParams?: unknown;
     /**
      * @deprecated Please use "parseJson" instead.

@@ -39,6 +39,11 @@ export const deprecatedOptions = [
     "jsonReviver",
     "jsonReplacer",
     "skipEventRequest",
+    "logger",
+    "debug",
+    "time",
+    "limiter",
+    "gene",
 ];
 
 export const getCharset = (headers: Record<string, unknown>): null | string => {
@@ -76,6 +81,7 @@ export const alignOptions = (options: RequestOptions): GotUrl => {
         url: options.url ?? options.uri,
         searchParams: options.searchParams ?? options.qs,
         decompress: options.decompress ?? options.gzip,
+        userParams: options.userParams ?? options.gene,
         parseJson: options.parseJson ?? options.jsonReviver,
         stringifyJson: options.stringifyJson ?? options.jsonReplacer,
         cookieJar: options.cookieJar ?? options.jar,

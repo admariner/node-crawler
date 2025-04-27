@@ -5,12 +5,21 @@ import { getValidOptions, alignOptions, getCharset } from "./options.js";
 import { getLogger } from "./logger.js";
 import type { CrawlerOptions, RequestOptions, RequestConfig, CrawlerResponse } from "./types/crawler.js";
 import { load } from "cheerio";
-import got from "got";
 import seenreq from "seenreq";
 import iconv from "iconv-lite";
-
+import { GotInstance, GotFn } from "got";
 // @todo: remove seenreq dependency
 const log = getLogger();
+
+// 缓存 got 实例
+let gotInstance: GotInstance<GotFn> | null = null;
+
+async function loadGot() {
+  if (!gotInstance) {
+    gotInstance = (await import("got")).default;
+  }
+  return gotInstance;
+}
 
 class Crawler extends EventEmitter {
     private _limiters: Cluster;
@@ -37,6 +46,8 @@ class Crawler extends EventEmitter {
             timeout: 20000,
             isJson: false,
             silence: false,
+            rejectUnauthorized: false, // set to "true" in production environment.
+            userAgents: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
         };
         this.options = { ...defaultOptions, ...options };
         if (this.options.rateLimit! > 0) {
@@ -137,6 +148,7 @@ class Crawler extends EventEmitter {
             }
             let response: CrawlerResponse;
             try {
+                const got = await loadGot(); // 动态加载 got
                 response = await got(alignOptions(options));
             } catch (error) {
                 log.debug(error);
@@ -233,18 +245,6 @@ class Crawler extends EventEmitter {
         return 0;
     }
 
-    /**
-     * @param rateLimiterId
-     * @param property
-     * @param value
-     * @description Set the rate limiter property.
-     * @version 2.0.0 Only support `rateLimit` change.
-     * @example
-     * ```js
-     * const crawler = new Crawler();
-     * crawler.setLimiter(0, "rateLimit", 1000);
-     * ```
-     */
     public setLimiter(rateLimiterId: number, property: string, value: unknown): void {
         if (!isNumber(rateLimiterId)) {
             log.error("rateLimiterId must be a number");
@@ -256,22 +256,6 @@ class Crawler extends EventEmitter {
         // @todo other properties
     }
 
-    /**
-     * @param options
-     * @returns if there is a "callback" function in the options, return the result of the callback function. \
-     * Otherwise, return a promise, which resolves when the request is successful and rejects when the request fails.
-     * In the case of the promise, the resolved value will be the response object.
-     * @description Send a request directly.
-     * @example
-     * ```js
-     * const crawler = new Crawler();
-     * crawler.send({
-     *      url: "https://example.com",
-     *      callback: (error, response, done) => { done(); }
-     * });
-     * await crawler.send("https://example.com");
-     * ```
-     */
     public send = async (options: RequestConfig): Promise<CrawlerResponse> => {
         options = getValidOptions(options);
         options.retries = options.retries ?? 0;
@@ -280,27 +264,11 @@ class Crawler extends EventEmitter {
         delete options.preRequest;
         return await this._execute(options);
     };
-    /**
-     * @deprecated
-     * @description Old interface version. It is recommended to use `Crawler.send()` instead.
-     * @see Crawler.send
-     */
+
     public direct = async (options: RequestConfig): Promise<CrawlerResponse> => {
         return await this.send(options);
     };
 
-    /**
-     * @param options
-     * @description Add a request to the queue.
-     * @example
-     * ```js
-     * const crawler = new Crawler();
-     * crawler.add({
-     *     url: "https://example.com",
-     *     callback: (error, response, done) => { done(); }
-     * });
-     * ```
-     */
     public add = (options: RequestConfig): void => {
         let optionsArray = Array.isArray(options) ? options : [options];
         optionsArray = flattenDeep(optionsArray);
@@ -328,11 +296,7 @@ class Crawler extends EventEmitter {
                 .catch((error: unknown) => log.error(error));
         });
     };
-    /**
-     * @deprecated
-     * @description Old interface version. It is recommended to use `Crawler.add()` instead.
-     * @see Crawler.add
-     */
+
     public queue = (options: RequestConfig): void => {
         return this.add(options);
     };
