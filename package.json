@@ -1,6 +1,6 @@
 {
     "name": "crawler",
-    "version": "2.0.2",
+    "version": "2.0.3-beta.1",
     "description": "Crawler is a ready-to-use web spider that works with proxies, asynchrony, rate limit, configurable request pools, jQuery, and HTTP/2 support.",
     "repository": {
         "type": "git",
@@ -8,8 +8,8 @@
     },
     "exports": {
         ".": {
-            "require": "./dist/index.js",
-            "import": "./dist/index.mjs"
+            "require": "./dist/index.cjs",
+            "import": "./dist/index.js"
         }
     },
     "scripts": {
