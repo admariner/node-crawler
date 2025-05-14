@@ -2,7 +2,7 @@ import { GotUrl } from "got";
 import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import http2Wrapper from "http2-wrapper";
 import { cleanObject, getType, isValidUrl } from "./lib/utils.js";
-import { RequestConfig, RequestOptions } from "./types/crawler.js";
+import { RequestConfig, RequestOptions, CrawlerOptions } from "./types/crawler.js";
 
 export const globalOnlyOptions = [
     "maxConnections",
@@ -44,6 +44,8 @@ export const deprecatedOptions = [
     "time",
     "limiter",
     "gene",
+    "jquery",
+    "userAgent",
 ];
 
 export const getCharset = (headers: Record<string, unknown>): null | string => {
@@ -75,20 +77,34 @@ export const getValidOptions = (options: RequestConfig): RequestOptions => {
     throw new TypeError(`Invalid options: ${JSON.stringify(options)}`);
 };
 
+export const renameOptionParams = (options: CrawlerOptions | undefined): CrawlerOptions | undefined => {
+    if (options == undefined) {
+        return undefined;
+    }
+    const renamedOptions: CrawlerOptions = {
+        ...options,
+        url: options.uri ?? options.url,
+        searchParams: options.qs ?? options.searchParams,
+        rejectUnauthorized: options.strictSSL ?? options.rejectUnauthorized,
+        encoding: options.incomingEncoding ?? options.encoding,
+        decompress: options.gzip ?? options.decompress,
+        cookieJar: options.jar ?? options.cookieJar,
+        parseJson: options.jsonReviver ?? options.parseJson,
+        stringifyJson: options.jsonReplacer ?? options.stringifyJson,
+        rateLimit: options.limiter ?? options.rateLimit,
+        userParams: options.gene ?? options.userParams,
+        jQuery: options.jquery ?? options.jQuery,
+    };
+    return renamedOptions;
+};
+
 export const alignOptions = (options: RequestOptions): GotUrl => {
     const gotOptions = {
         ...options,
-        url: options.url ?? options.uri,
-        searchParams: options.searchParams ?? options.qs,
-        decompress: options.decompress ?? options.gzip,
-        userParams: options.userParams ?? options.gene,
-        parseJson: options.parseJson ?? options.jsonReviver,
-        stringifyJson: options.stringifyJson ?? options.jsonReplacer,
-        cookieJar: options.cookieJar ?? options.jar,
         timeout: { request: options.timeout },
     } as any;
 
-    const sslConfig = options.rejectUnauthorized ?? options.strictSSL;
+    const sslConfig = options.rejectUnauthorized;
     if (sslConfig !== undefined) {
         if (gotOptions.https === undefined) {
             gotOptions.https = { rejectUnauthorized: sslConfig };
@@ -123,7 +139,6 @@ export const alignOptions = (options: RequestOptions): GotUrl => {
     /**
      * @deprecated The support of incomingEncoding will be removed in the next major version.
      */
-    if (options.encoding === undefined) options.encoding = options.incomingEncoding;
     gotOptions.responseType = "buffer";
 
     const invalidOptions = crawlerOnlyOptions.concat(deprecatedOptions);

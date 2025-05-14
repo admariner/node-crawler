@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { Cluster } from "./rateLimiter/index.js";
 import { isBoolean, isFunction, setDefaults, flattenDeep, lowerObjectKeys, isNumber } from "./lib/utils.js";
-import { getValidOptions, alignOptions, getCharset } from "./options.js";
+import { getValidOptions, alignOptions, getCharset, renameOptionParams } from "./options.js";
 import { getLogger } from "./logger.js";
 import type { CrawlerOptions, RequestOptions, RequestConfig, CrawlerResponse } from "./types/crawler.js";
 import { load } from "cheerio";
@@ -49,6 +49,7 @@ class Crawler extends EventEmitter {
             rejectUnauthorized: false, // set to "true" in production environment.
             userAgents: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
         };
+        options = renameOptionParams(options);
         this.options = { ...defaultOptions, ...options };
         if (this.options.rateLimit! > 0) {
             this.options.maxConnections = 1;
@@ -58,8 +59,8 @@ class Crawler extends EventEmitter {
         }
 
         this._limiters = new Cluster({
-            maxConnections: this.options.maxConnections!,
-            rateLimit: this.options.rateLimit!,
+            maxConnections: this.options.maxConnection !== undefined ? this.options.maxConnection : this.options.maxConnections!,
+            rateLimit: this.options.limiter !== undefined ? this.options.limiter : this.options.rateLimit!,
             priorityLevels: this.options.priorityLevels!,
             defaultPriority: this.options.priority!,
             homogeneous: this.options.homogeneous,
@@ -245,6 +246,18 @@ class Crawler extends EventEmitter {
         return 0;
     }
 
+    /**
+     * @param rateLimiterId
+     * @param property
+     * @param value
+     * @description Set the rate limiter property.
+     * @version 2.0.0 Only support `rateLimit` change.
+     * @example
+     * ```js
+     * const crawler = new Crawler();
+     * crawler.setLimiter(0, "rateLimit", 1000);
+     * ```
+     */
     public setLimiter(rateLimiterId: number, property: string, value: unknown): void {
         if (!isNumber(rateLimiterId)) {
             log.error("rateLimiterId must be a number");

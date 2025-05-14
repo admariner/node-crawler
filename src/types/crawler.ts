@@ -45,6 +45,14 @@ export type GlobalOnlyOptions = {
      * @description If true, the crawler will mute all warning and error messages. The request error will be still thrown.
      */
     silence?: boolean;
+    /**
+     * @deprecated Please use "maxConnections" instead.
+     */
+    maxConnection: number;
+    /**
+     * @deprecated Please use "rateLimit" instead.
+     */
+    limiter?: number;
 };
 
 export type RequestOptions = {
@@ -57,6 +65,11 @@ export type RequestOptions = {
      * @example If inject successfully, the response object will have "$" property, which is a function to use jQuery.
      */
     jQuery?: boolean;
+    /**
+     * @deprecated
+     * @description Please use "jQuery" instead.
+     */
+    jquery?: boolean;
     /**
      * @deprecated
      * @description Please use "encoding" instead.
@@ -112,10 +125,6 @@ export type RequestOptions = {
      */
     time?: any;
     /**
-     * @deprecated Please use "rateLimit" instead.
-     */
-    limiter?: any;
-    /**
      * @deprecated Please use "url" instead.
      */
     uri?: string | ((urlFn: (url: string) => void) => void);
@@ -124,7 +133,7 @@ export type RequestOptions = {
     /**
      * @deprecated Please use "searchParams" instead.
      */
-    qs?: string | Record<string, unknown>;
+    qs?: Record<string, unknown>;
     searchParams?: Record<string, unknown>;
 
     /**
