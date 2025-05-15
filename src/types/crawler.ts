@@ -72,6 +72,11 @@ export type RequestOptions = {
     jquery?: boolean;
     /**
      * @deprecated
+     * @description Please use "jQuery" instead.
+     */
+    JQuery?: boolean;
+    /**
+     * @deprecated
      * @description Please use "encoding" instead.
      */
     incomingEncoding?: string | null;

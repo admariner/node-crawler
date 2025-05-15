@@ -93,7 +93,7 @@ export const renameOptionParams = (options: CrawlerOptions | undefined): Crawler
         stringifyJson: options.jsonReplacer ?? options.stringifyJson,
         rateLimit: options.limiter ?? options.rateLimit,
         userParams: options.gene ?? options.userParams,
-        jQuery: options.jquery ?? options.jQuery,
+        jQuery: options.jquery ?? options.JQuery ?? options.jQuery,
     };
     return renamedOptions;
 };

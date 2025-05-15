@@ -1,5 +1,7 @@
 node-crawler ChangeLog
 -------------------------
+2.0.3
+- Add support for legacy code written using crawler v1.
 
 2.0.2
 - Add **Global Only Options : `silence`** to mute all crawler messages, including warnings and errors.
