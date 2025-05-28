@@ -1,14 +1,20 @@
 {
     "name": "crawler",
-    "version": "2.0.2",
+    "version": "2.0.3-beta.2",
     "description": "Crawler is a ready-to-use web spider that works with proxies, asynchrony, rate limit, configurable request pools, jQuery, and HTTP/2 support.",
     "repository": {
         "type": "git",
         "url": "https://github.com/bda-research/node-crawler.git"
     },
-    "exports": "./dist/index.js",
+    "exports": {
+        ".": {
+            "require": "./dist/index.cjs",
+            "import": "./dist/index.js"
+        }
+    },
     "scripts": {
-        "build": "tsc",
+        "build": "tsup src/index.ts --format cjs,esm --clean",
+        "prepublishOnly": "npm run build",
         "test": "NODE_ENV=test ava",
         "cover": "NODE_ENV=test c8 ava"
     },
@@ -41,7 +47,8 @@
         "http2-wrapper": "^2.2.1",
         "iconv-lite": "^0.6.3",
         "seenreq": "^3.0.0",
-        "tslog": "^4.9.3"
+        "tslog": "^4.9.3",
+        "tsup": "^8.4.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.8.0",

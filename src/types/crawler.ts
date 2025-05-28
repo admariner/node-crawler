@@ -45,6 +45,14 @@ export type GlobalOnlyOptions = {
      * @description If true, the crawler will mute all warning and error messages. The request error will be still thrown.
      */
     silence?: boolean;
+    /**
+     * @deprecated Please use "maxConnections" instead.
+     */
+    maxConnection: number;
+    /**
+     * @deprecated Please use "rateLimit" instead.
+     */
+    limiter?: number;
 };
 
 export type RequestOptions = {
@@ -57,6 +65,16 @@ export type RequestOptions = {
      * @example If inject successfully, the response object will have "$" property, which is a function to use jQuery.
      */
     jQuery?: boolean;
+    /**
+     * @deprecated
+     * @description Please use "jQuery" instead.
+     */
+    jquery?: boolean;
+    /**
+     * @deprecated
+     * @description Please use "jQuery" instead.
+     */
+    JQuery?: boolean;
     /**
      * @deprecated
      * @description Please use "encoding" instead.
@@ -99,7 +117,18 @@ export type RequestOptions = {
     body?: string | Record<string, unknown>;
     headers?: Record<string, unknown>;
     agent?: any;
-
+    /**
+     * @deprecated Please do not set 'logger' anymore.
+     */
+    logger?: any;
+    /**
+     * @deprecated Please do not set 'debug' anymore.
+     */
+    debug?: any;
+    /**
+     * @deprecated Please do not set 'time' anymore.
+     */
+    time?: any;
     /**
      * @deprecated Please use "url" instead.
      */
@@ -109,7 +138,7 @@ export type RequestOptions = {
     /**
      * @deprecated Please use "searchParams" instead.
      */
-    qs?: string | Record<string, unknown>;
+    qs?: Record<string, unknown>;
     searchParams?: Record<string, unknown>;
 
     /**
@@ -144,6 +173,11 @@ export type RequestOptions = {
     isJson?: boolean;
 
     referer?: string;
+        /**
+     * @deprecated
+     * @description Please use "userParams" instead.
+     */
+    gene?: string | Record<string, unknown>;
     userParams?: unknown;
     /**
      * @deprecated Please use "parseJson" instead.

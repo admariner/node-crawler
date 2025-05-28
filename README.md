@@ -41,7 +41,7 @@ Requires Node.js 18 or above.
 $ npm install crawler
 ```
 
-**Warning:** Given the dependencies involved (Especially migrating from request to got) , **Crawler v2** has been designed as a native [ESM](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) and no longer offers a CommonJS export. We would also like to recommend that you [convert to ESM](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c). Note that making this transition is generally not too difficult.
+**Warning:** Given the dependencies involved (Especially migrating from request to got) , **Crawler v2** has been designed as a native [ESM](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) and no longer offers a CommonJS export. We would also like to recommend that you [convert to ESM](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c). Note that making this transition is generally not too difficult.If you have a large codebase built with Crawler v1, you can upgrade to v2.0.3-beta (using ```npm install crawler@beta```), which supports both ESM and CommonJS builds.Please note that code previously using the "body" parameter to send form data in POST requests will need to be updated to use "form" even in the beta version.
 
 ## Usage
 
@@ -665,7 +665,6 @@ Crawler by default use [Cheerio](https://github.com/cheeriojs/cheerio). We are t
 
 **Some practices that were acceptable and offen used in version 1 but not in version 2：**
 
--   use “jquery/JQuery/..." => **Only "jQuery" will be accepted.**
 -   use "body" as the POST form => **Please use "form" instead. For more, see [options](https://github.com/sindresorhus/got/blob/main/documentation/2-options.md) .**
 -   add custom options on request options => **Not allowed. Only options.userParams could pass through the response.**
 -   We are temporarily no longer supporting jsdom for certain reasons.
