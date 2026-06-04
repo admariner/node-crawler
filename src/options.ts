@@ -1,4 +1,4 @@
-import { GotUrl } from "got";
+import type { OptionsInit } from "got";
 import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import http2Wrapper from "http2-wrapper";
 import { cleanObject, getType, isValidUrl } from "./lib/utils.js";
@@ -95,10 +95,17 @@ export const renameOptionParams = (options: CrawlerOptions | undefined): Crawler
         userParams: options.gene ?? options.userParams,
         jQuery: options.jquery ?? options.JQuery ?? options.jQuery,
     };
+    // Drop keys that resolved to undefined so they don't clobber crawler
+    // defaults when spread via { ...defaultOptions, ...options }.
+    (Object.keys(renamedOptions) as (keyof CrawlerOptions)[]).forEach(key => {
+        if (renamedOptions[key] === undefined) {
+            delete renamedOptions[key];
+        }
+    });
     return renamedOptions;
 };
 
-export const alignOptions = (options: RequestOptions): GotUrl => {
+export const alignOptions = (options: RequestOptions): OptionsInit => {
     const gotOptions = {
         ...options,
         timeout: { request: options.timeout },
