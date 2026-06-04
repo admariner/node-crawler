@@ -1,4 +1,5 @@
-import { GotUrl } from "got";
+import net from "net";
+import type { OptionsInit } from "got";
 import { HttpProxyAgent, HttpsProxyAgent } from "hpagent";
 import http2Wrapper from "http2-wrapper";
 import { cleanObject, getType, isValidUrl } from "./lib/utils.js";
@@ -28,6 +29,8 @@ export const crawlerOnlyOptions = [
     "referer",
     "rejectUnauthorized",
     "userParams",
+    "autoSelectFamily",
+    "autoSelectFamilyAttemptTimeout",
 ].concat(globalOnlyOptions);
 export const deprecatedOptions = [
     "uri",
@@ -95,10 +98,29 @@ export const renameOptionParams = (options: CrawlerOptions | undefined): Crawler
         userParams: options.gene ?? options.userParams,
         jQuery: options.jquery ?? options.JQuery ?? options.jQuery,
     };
+    // Drop keys that resolved to undefined so they don't clobber crawler
+    // defaults when spread via { ...defaultOptions, ...options }.
+    (Object.keys(renamedOptions) as (keyof CrawlerOptions)[]).forEach(key => {
+        if (renamedOptions[key] === undefined) {
+            delete renamedOptions[key];
+        }
+    });
     return renamedOptions;
 };
 
-export const alignOptions = (options: RequestOptions): GotUrl => {
+export const alignOptions = (options: RequestOptions): OptionsInit => {
+    // "Happy Eyeballs" tuning. got strips unknown options and manages the
+    // http2 session internally, so these socket-level settings can't be passed
+    // per-request through got — Node only exposes them as process-wide defaults.
+    // Applied here (before they are stripped below) so they take effect for both
+    // the http1 and http2 paths. Guarded because the setters only exist on Node >=19.
+    if (options.autoSelectFamily !== undefined && typeof net.setDefaultAutoSelectFamily === "function") {
+        net.setDefaultAutoSelectFamily(options.autoSelectFamily);
+    }
+    if (options.autoSelectFamilyAttemptTimeout !== undefined && typeof net.setDefaultAutoSelectFamilyAttemptTimeout === "function") {
+        net.setDefaultAutoSelectFamilyAttemptTimeout(options.autoSelectFamilyAttemptTimeout);
+    }
+
     const gotOptions = {
         ...options,
         timeout: { request: options.timeout },

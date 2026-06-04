@@ -7,12 +7,12 @@ import type { CrawlerOptions, RequestOptions, RequestConfig, CrawlerResponse } f
 import { load } from "cheerio";
 import seenreq from "seenreq";
 import iconv from "iconv-lite";
-import { GotInstance, GotFn } from "got";
+import type { Got } from "got";
 // @todo: remove seenreq dependency
 const log = getLogger();
 
 // 缓存 got 实例
-let gotInstance: GotInstance<GotFn> | null = null;
+let gotInstance: Got | null = null;
 
 async function loadGot() {
   if (!gotInstance) {
@@ -150,7 +150,10 @@ class Crawler extends EventEmitter {
             let response: CrawlerResponse;
             try {
                 const got = await loadGot(); // 动态加载 got
-                response = await got(alignOptions(options));
+                // got v15 no longer accepts `url` inside the options object; it
+                // must be passed as the first argument.
+                const { url, ...gotOptions } = alignOptions(options);
+                response = await got(url as string | URL, gotOptions);
             } catch (error) {
                 log.debug(error);
                 return this._handler(error, options);
@@ -195,6 +198,9 @@ class Crawler extends EventEmitter {
             }
         }
         if (!response.body) response.body = "";
+        // got v15 returns the body as a Uint8Array; normalize to Buffer so
+        // charset sniffing and iconv decoding behave as before.
+        else if (!Buffer.isBuffer(response.body)) response.body = Buffer.from(response.body as Uint8Array);
         log.debug("Got " + (options.url || "html") + " (" + response.body.length + " bytes)...");
         response.options = options;
 
