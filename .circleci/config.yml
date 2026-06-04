@@ -16,11 +16,10 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - run: |
-          npm install --prefix=$HOME/.local -g pnpm
-          pnpm install
-          pnpm eslint
-          pnpm build
-          pnpm test
+          npm ci
+          npx eslint
+          npm run build
+          npm test
 workflows:
   # Below is the definition of your workflow.
   # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
