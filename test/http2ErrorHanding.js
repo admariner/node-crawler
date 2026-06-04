@@ -32,7 +32,12 @@ testCb(test, "http2: should return a timeout error after ~3sec.", async t => {
         url: "https://nghttp2.org/httpbin/delay/4",
         callback: (error, response, done) => {
             t.truthy(error);
-            t.true(error.code === "ETIMEDOUT" || error.code === "ESOCKETTIMEDOUT");
+            // got 15 aborts an http2 request-timeout by resetting the stream, so
+            // it surfaces as ECONNRESET rather than a TimeoutError/ETIMEDOUT.
+            t.true(
+                ["ETIMEDOUT", "ESOCKETTIMEDOUT", "ECONNRESET"].includes(error.code),
+                `unexpected error code: ${error.code}`
+            );
             done();
             t.end();
         },
