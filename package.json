@@ -19,7 +19,7 @@
         "cover": "NODE_ENV=test c8 ava"
     },
     "engines": {
-        "node": ">=18"
+        "node": ">=22"
     },
     "type": "module",
     "keywords": [
