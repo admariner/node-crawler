@@ -114,6 +114,25 @@ export type RequestOptions = {
     proxies?: string[];
     proxy?: string;
     http2?: boolean;
+    /**
+     * @description Forwarded to Node's socket connection (`net`/`tls`). Controls the "Happy Eyeballs"
+     * algorithm that races IPv6 and IPv4 when a host is dual-stack.
+     * @default true (Node default)
+     * @example Set to false on networks with broken or slow IPv6 to connect over a single family
+     * and avoid spurious `ETIMEDOUT` errors.
+     * Note: Node applies this as a process-wide default, so it affects all in-flight requests.
+     */
+    autoSelectFamily?: boolean;
+    /**
+     * @description Forwarded to Node's socket connection (`net`/`tls`). The per-address timeout (ms)
+     * the "Happy Eyeballs" algorithm waits before trying the next address.
+     * @default 250 (Node default)
+     * @example Raise this (e.g. 5000) when connecting to high-latency dual-stack hosts whose TCP/TLS
+     * handshake can't finish within 250ms, which otherwise aborts with `ETIMEDOUT` before the working
+     * address responds.
+     * Note: Node applies this as a process-wide default, so it affects all in-flight requests.
+     */
+    autoSelectFamilyAttemptTimeout?: number;
     body?: string | Record<string, unknown>;
     headers?: Record<string, unknown>;
     agent?: any;

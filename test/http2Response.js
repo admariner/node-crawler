@@ -14,10 +14,16 @@ testCb(test, "response statusCode.", async t => {
         retries: 2,
         jQuery: false,
         http2: true,
+        // nghttp2.org is dual-stack and high-latency; give the slow-but-working
+        // address time to connect instead of aborting on Node's 250ms default.
+        autoSelectFamilyAttemptTimeout: 5000,
     });
     t.context.crawler.add({
         url: "https://nghttp2.org/httpbin/status/200",
         callback: (error, response, done) => {
+			if(error){
+				console.log(error);
+			}
             t.is(response.statusCode, 200);
             done();
             t.end();
@@ -32,6 +38,7 @@ testCb(test, "response headers.", async t => {
         retries: 2,
         jQuery: false,
         http2: true,
+        autoSelectFamilyAttemptTimeout: 5000,
     });
     t.context.crawler.add({
         url: "https://nghttp2.org/httpbin/status/200",
@@ -52,6 +59,7 @@ testCb(test, "html response body.", async t => {
         retries: 2,
         jQuery: true,
         http2: true,
+        autoSelectFamilyAttemptTimeout: 5000,
     });
     t.context.crawler.add({
         url: "https://nghttp2.org/httpbin/html",

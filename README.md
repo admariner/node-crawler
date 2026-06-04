@@ -268,6 +268,8 @@ crawler.send({
       - [`proxies`](#proxies)
       - [`proxy`](#proxy)
       - [`http2`](#http2)
+      - [`autoSelectFamily`](#autoselectfamily)
+      - [`autoSelectFamilyAttemptTimeout`](#autoselectfamilyattempttimeout)
       - [`referer`](#referer)
       - [`userParams`](#userparams)
       - [`preRequest`](#prerequest-1)
@@ -584,6 +586,20 @@ crawler.on("schedule", options => {
 -   **Type:** `boolean`
 -   **Default** : false
 -   If true, the request will be sent in the HTTP/2 protocol.
+
+#### `autoSelectFamily`
+
+-   **Type:** `boolean`
+-   **Default** : true (Node default)
+-   Controls Node's "Happy Eyeballs", which races IPv6 and IPv4 when a host has both. Set to false on networks with broken or slow IPv6 to use a single family and avoid spurious `ETIMEDOUT` errors.
+-   **Note:** Node applies this as a process-wide default, so it affects all in-flight requests.
+
+#### `autoSelectFamilyAttemptTimeout`
+
+-   **Type:** `number`
+-   **Default** : 250 (Node default)
+-   How long, in milliseconds, "Happy Eyeballs" waits for one address before trying the next. Raise it (e.g. 5000) for high-latency hosts whose connection can't finish within 250ms, which otherwise fails with `ETIMEDOUT` before the working address responds.
+-   **Note:** Node applies this as a process-wide default, so it affects all in-flight requests.
 
 #### `referer`
 
