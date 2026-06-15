@@ -9,7 +9,6 @@ description: >-
   instead. Triggers: scrape website at scale, crawl hundreds of pages, batch
   download files, web spider, data extraction from many URLs, crawl multiple pages
   with retries and proxies.
-agent_created: true
 metadata:
   author: Mike Chen
   version: "1.0"
@@ -39,6 +38,7 @@ when the task is substantial:
 
 - Scraping **many pages** (dozens to millions) with structured data extraction
 - **Batch-downloading** files — images, PDFs, archives — with retry and resume
+  (resume logic is developer-implemented via `userParams` and file existence checks)
 - **Long-running spiders** that need rate limiting, retries, and connection pooling
 - **Multi-step workflows** — pagination, link following, cascading crawls
 - **Proxy rotation**, charset detection, HTTP/2 — infrastructure a real
@@ -52,78 +52,7 @@ when the task is substantial:
   (Playwright/Puppeteer) instead
 - Simple **API data fetching** → `fetch` / `got` with JSON parsing
 
-## CLI — preferred for most tasks
-
-The bundled CLI covers the three core patterns. Prefer it over writing scripts
-for scrape / download / spider tasks. The script is at `scripts/crawler-cli.js`
-and requires Node.js >= 22 and `crawler` installed.
-
-### scrape — extract data with CSS selectors
-
-```bash
-# Extract page titles from a list of URLs
-node scripts/crawler-cli.js scrape https://example.com https://other.com \
-  -s "title" -s "h1" -o results.json
-
-# Extract hrefs from all links
-node scripts/crawler-cli.js scrape https://example.com \
-  -s "a" -a href -o links.json
-
-# Scrape with proxy, concurrency control, and rate limiting
-node scripts/crawler-cli.js scrape -f urls.txt \
-  -s ".product-name" -s ".price" \
-  -p http://proxy:8888 --rate-limit 500 -c 5 -o products.json
-
-# Read URLs from a file (one per line)
-node scripts/crawler-cli.js scrape -f urls.txt -s "h2" -o titles.json
-```
-
-### download — batch download files
-
-```bash
-# Download all images listed in a file
-node scripts/crawler-cli.js download -f images.txt -d ./images
-
-# With rate limiting and proxy
-node scripts/crawler-cli.js download -f files.txt \
-  -d ./downloads --rate-limit 1000 -p http://proxy:8888
-
-# Download specific URLs directly
-node scripts/crawler-cli.js download \
-  https://host/file1.png https://host/file2.pdf -d ./out
-```
-
-### spider — recursive crawl following links
-
-```bash
-# Crawl a site, depth 3, extract all h2 text
-node scripts/crawler-cli.js spider https://example.com/docs \
-  -s "h2" --depth 3 -o pages.json
-
-# Crawl with proxy, cross-origin, depth 5, extract links
-node scripts/crawler-cli.js spider https://example.com \
-  -s "article" --link-selector "a.internal" --depth 2 --rate-limit 1000
-```
-
-### Common options (all commands)
-
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-c, --concurrency` | Max concurrent requests | 10 |
-| `-r, --rate-limit` | Min gap between requests (ms) | 0 |
-| `-p, --proxy` | Proxy URL | — |
-| `--retries` | Retry count on failure | 2 |
-| `-t, --timeout` | Request timeout (ms) | 20000 |
-| `--http2` | Use HTTP/2 | — |
-| `-f, --url-file` | Read URLs from file | — |
-| `--silent` | Suppress progress output | — |
-
-Run `node scripts/crawler-cli.js --help` for the full reference.
-
-## Programmatic API — for custom logic
-
-When the CLI cannot express the required logic (complex callbacks, dynamic
-scheduling, multi-stage pipelines), fall back to the programmatic API.
+## API
 
 ### Core decision: Queue vs Send
 
