@@ -50,8 +50,7 @@
         "http2-wrapper": "^2.2.1",
         "iconv-lite": "^0.7.2",
         "seenreq": "^3.0.0",
-        "tslog": "^4.10.2",
-        "tsup": "^8.5.1"
+        "tslog": "^4.10.2"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -63,9 +62,13 @@
         "nock": "^14.0.15",
         "sinon": "^22.0.0",
         "tough-cookie": "^6.0.1",
+        "tsup": "^8.5.1",
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.60.1"
+    },
+    "overrides": {
+        "esbuild": "^0.28.1"
     },
     "ava": {
         "files": [
