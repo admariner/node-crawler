@@ -29,6 +29,29 @@ Features:
 
 If you have prior experience with Crawler v1, for fast migration, please proceed to the section [Differences and Breaking Changes](#differences-and-breaking-changes).
 
+## Use with AI agents
+
+This package ships an [agent skill](skills/node-crawler/SKILL.md) that teaches AI agents (e.g. OpenClaw, Hermes, Claude Code, Codex etc) how to crawl with `crawler` — queue vs. direct requests, rate limiting, proxy rotation, Cheerio parsing, and common pitfalls.
+
+**Recommended — install from ClawHub:** [clawhub.ai/mike442144/node-crawler](https://clawhub.ai/mike442144/node-crawler)
+
+```sh
+openclaw skills install node-crawler
+```
+
+**Fallback — download the skill bundle** from the [latest release](https://github.com/bda-research/node-crawler/releases/latest) and unzip it into your agent's skills directory:
+
+```sh
+curl -L -o node-crawler-skill.zip https://github.com/bda-research/node-crawler/releases/latest/download/node-crawler-skill.zip
+unzip node-crawler-skill.zip -d .openclaw/skills/
+```
+
+**Let your agent install it — paste this prompt:**
+
+> Install the `node-crawler` skill so you can use it for large-scale web crawling: download `https://github.com/bda-research/node-crawler/releases/latest/download/node-crawler-skill.zip`, unzip it, and place the `node-crawler/` folder in your skills directory (e.g. `.openclaw/skills/`, `.claude/skills/`, or wherever your runtime loads skills from).
+
+The agent loads it automatically when a task involves large-scale scraping or crawling.
+
 # Quick start
 
 ## Install
