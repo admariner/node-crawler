@@ -571,6 +571,12 @@ items in the **crawler.add()** calls if you want them to be specific to that ite
 -   **Default** : true
 -   If true, the crawler will parse the response body as HTML.
 
+#### `isJson`
+
+-   **Type:** `boolean`
+-   **Default** : false
+-   If true, the crawler will parse the response body as JSON. This will also force the encoding to UTF-8 and disable jQuery (cheerio) parsing.
+
 #### `proxies`
 
 -   **Type:** `string[]`
